@@ -81,15 +81,15 @@ export function $print(...params: unknown[]): void;
 
 /**
  * Similar to `assert`, except it's prefixed w/ the inner expression and file info, e.g.
- * 
+ *
  * ```ts
  * $assert(x === y, "X is not Y");
  * ```
- * 
+ *
  * would result in
- * 
+ *
  * `[file.ts:1] x === y: X is not Y`
- * @param condition 
+ * @param condition
  */
 export function $assert<T>(condition: T, message?: string): asserts condition;
 
@@ -124,6 +124,11 @@ export function $nameof<T>(): string;
 export function $nameof(value: unknown): string;
 
 export interface $git {
+	/**
+	 * Whether or not the project repository contains uncommited changes
+	 */
+	readonly Dirty: boolean;
+	
 	/**
 	 * The name of the branch this project is on
 	 */

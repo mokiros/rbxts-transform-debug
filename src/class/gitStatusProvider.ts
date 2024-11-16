@@ -1,6 +1,7 @@
 import { TransformState } from "./transformState";
 import fs from "fs";
 import path from "path";
+import { execSync } from "child_process";
 import gitRepoInfo, { GitRepoInfo } from "git-repo-info";
 import chalk from "chalk";
 
@@ -16,6 +17,7 @@ type Nullable<T> = { [P in keyof T]: T[P] | null };
 
 export class GitStatusProvider {
 	private tracked = false;
+	private dirty = false;
 
 	private props: Partial<GitProp> = {};
 	private repoInfo: Nullable<GitRepoInfo>;
@@ -27,6 +29,9 @@ export class GitStatusProvider {
 			this.tracked = true;
 		}
 
+		const gitTreeDirty = execSync("git status --porcelain").toString().trim().length > 0;
+		this.dirty = gitTreeDirty;
+
 		const repoInfo = gitRepoInfo();
 		this.repoInfo = repoInfo;
 		this.unixTimestamp = Math.round(
@@ -36,6 +41,10 @@ export class GitStatusProvider {
 
 	public isTracked(): boolean {
 		return this.tracked;
+	}
+
+	public isDirty(): boolean {
+		return this.dirty;
 	}
 
 	public query<TGitQuery extends keyof GitProp>(gitQuery: TGitQuery): GitProp[TGitQuery] {

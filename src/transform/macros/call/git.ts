@@ -16,7 +16,7 @@ export function stringArgsToSet<K extends string = string>(
 }
 
 type ValueOf<T> = T[keyof T];
-const keys = ["Commit", "Branch", "CommitHash", "LatestTag", "ISODate", "Timestamp"] as const;
+const keys = ["Dirty", "Commit", "Branch", "CommitHash", "LatestTag", "ISODate", "Timestamp"] as const;
 
 export function transformGit(state: TransformState, expression: ts.CallExpression): ts.Expression {
 	let toInclude: ReadonlySet<string> = new Set(keys);
@@ -49,6 +49,10 @@ export function transformGit(state: TransformState, expression: ts.CallExpressio
 	}
 
 	const properties = new Array<PropertyAssignment>();
+
+	if (toInclude.has("Dirty")) {
+		properties.push(factory.createPropertyAssignment("Dirty", git.isDirty() ? factory.createTrue() : factory.createFalse()));
+	}
 
 	if (toInclude.has("Branch")) {
 		properties.push(factory.createPropertyAssignment("Branch", factory.createStringLiteral(git.query("branch"))));
